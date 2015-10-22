@@ -1,0 +1,51 @@
+{
+    "folder": "dockercont",
+    "containers": {
+        "rss_rabbit": {
+            "folder": "",
+            "name": "rss_rabbit",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "",
+                "ExtRepo": true
+            },
+            "env": {
+                "dependent": [],
+                "volumes": [
+                ],
+                "vars": [
+                    []
+                ]
+            },
+            "ports": [
+                []
+            ]
+        },
+        "mongo_from_script4": {
+            "folder": "",
+            "name": "mongo_from_script4",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "mongo:latest",
+                "ExtRepo": true
+            },
+            "env": {
+                "dependent": [
+                    "rss_rabbit"
+                ],
+                "volumes": [
+                ],
+                "vars": [
+                    "Var1=Val1"
+                ],
+                "ports": [
+                    [
+                        1488
+                    ]
+                ]
+            }
+        }
+    }
+}
