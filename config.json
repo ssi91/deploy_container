@@ -78,7 +78,7 @@
                 ],
                 "volumes": [
                     [
-                        "uwsgihs/ngx_openresty/www/hotsubs",
+                        "ngx_openresty/www/hotsubs",
                         "/var/www/hotsubs"
                     ]
                 ],
