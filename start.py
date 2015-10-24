@@ -3,6 +3,8 @@ import parseconfig
 import argparse
 import os
 import docker
+import json
+from io import BytesIO
 
 
 def create_parser():
@@ -14,7 +16,6 @@ def create_parser():
 
 parser = create_parser()
 namespace = parser.parse_args(sys.argv[1:])
-# print(namespace.home)
 
 config = parseconfig.conf_dict("config.json")
 
@@ -73,16 +74,31 @@ def run_container(cont):
 		if len(port) == 2:
 			port_bind[port[0]] = port[1]
 		elif len(port) == 1:
-			port_bind[port[0]] = None
+			pass
+		# port_bind[port[0]] = None
 	links = []
 	for link in cont["env"]["dependent"]:
 		links.append((link, link))
-	if cont["image"]["ExtRepo"]:
-		container_id = docker_client.create_container(image = cont["image"]["RepoTag"], name = cont["name"], volumes = vol_point,
-													  host_config = docker.utils.create_host_config(binds = binds, port_bindings = port_bind,
-																									links = links), environment = cont["env"]["vars"],
-													  ports = ports)
-		docker_client.start(container_id)
+	if not is_exist_image(cont["image"]["RepoTag"]):
+		repo, tag = cont["image"]["RepoTag"].split(":")
+		for line in docker_client.pull(repository = repo, tag = tag, stream = True):
+			print(json.dumps(json.loads(line.decode('utf-8')), indent = 4).encode("utf-8"))
+
+	container_id = docker_client.create_container(image = cont["image"]["RepoTag"], name = cont["name"], volumes = vol_point, ports = ports,
+												  host_config = docker.utils.create_host_config(binds = binds, port_bindings = port_bind,
+																								links = links), environment = cont["env"]["vars"])
+	docker_client.start(container_id)
+
+
+def build_container(cont):
+	df = open(cont["folder"] + "/Dockerfile", "r")
+	dockerfile = df.read()
+	f = BytesIO(dockerfile.encode('utf-8'))
+	response = []
+	for line in docker_client.build(fileobj = f, rm = True, tag = cont["image"]["RepoTag"]):
+		print(json.dumps(json.loads(line.decode('utf-8')), indent = 4).encode("utf-8"))
+		response.append(line)
+	return response
 
 
 def starter(cont):
@@ -102,8 +118,8 @@ def starter(cont):
 		else:
 			contaner_path = root_folder + "/{0}".format(cont["name"])
 			if os.path.exists(contaner_path) and os.path.exists(contaner_path + "/Dockerfile"):
-				# TODO Запустить билд образа, указав имя_папки_image в качестве repo:tag
-				pass
+				build_container(cont)
+				run_container(cont)
 			else:
 				raise Exception("path error")
 
