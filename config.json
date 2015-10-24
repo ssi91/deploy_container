@@ -1,30 +1,27 @@
 {
     "folder": "dockercont",
     "containers": {
-        "rss_rabbit": {
+        "hs_rmq": {
             "folder": "",
-            "name": "rss_rabbit",
+            "name": "hs_rmq",
             "id": "",
             "image": {
                 "id": "",
-                "RepoTag": "",
+                "RepoTag": "rabbitmq:3",
                 "ExtRepo": true
             },
             "env": {
                 "dependent": [],
                 "volumes": [
                 ],
-                "vars": [
-                    []
+                "vars": [],
+                "ports": [
                 ]
-            },
-            "ports": [
-                []
-            ]
+            }
         },
-        "mongo_from_script4": {
+        "hs_mongo_journal": {
             "folder": "",
-            "name": "mongo_from_script4",
+            "name": "hs_mongo_journal",
             "id": "",
             "image": {
                 "id": "",
@@ -32,17 +29,98 @@
                 "ExtRepo": true
             },
             "env": {
+                "dependent": [],
+                "volumes": [
+                    [
+                        "uwsgihs/hs_mongo_journal",
+                        "/data/db"
+                    ]
+                ],
+                "vars": [],
+                "ports": [
+                ]
+            }
+        },
+        "hs_mongo_data": {
+            "folder": "",
+            "name": "hs_mongo_data",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "mongo:latest",
+                "ExtRepo": true
+            },
+            "env": {
+                "dependent": [],
+                "volumes": [
+                    "uwsgihs/hs_mongo_data",
+                    "/data/db"
+                ],
+                "vars": [],
+                "ports": [
+                ]
+            }
+        },
+        "uwsgihs": {
+            "folder": "uwsgihs",
+            "name": "uwsgihs",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "uwsgihs:0",
+                "ExtRepo": false
+            },
+            "env": {
                 "dependent": [
-                    "rss_rabbit"
+                    "hs_mongo_data",
+                    "hs_mongo_journal",
+                    "hs_rmq"
                 ],
                 "volumes": [
+                    [
+                        "uwsgihs/ngx_openresty/www/hotsubs",
+                        "/var/www/hotsubs"
+                    ]
                 ],
                 "vars": [
-                    "Var1=Val1"
+                ],
+                "ports": [
+                ]
+            }
+        },
+        "ngx_openresty": {
+            "folder": "ngx_openresty",
+            "name": "ngx_openresty",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "ngx_openresty:0",
+                "ExtRepo": false
+            },
+            "env": {
+                "dependent": [
+                    "uwsgihs"
+                ],
+                "volumes": [
+                    [
+                        "ngx_openresty/conf",
+                        "/usr/local/openresty/nginx/conf"
+                    ],
+                    [
+                        "ngx_openresty/www",
+                        "/var/www"
+                    ]
+                ],
+                "vars": [
                 ],
                 "ports": [
                     [
-                        1488
+                        80,
+                        80
+                    ],
+                    [
+                        443,
+                        443
                     ]
                 ]
             }
