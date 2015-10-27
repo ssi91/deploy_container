@@ -91,17 +91,21 @@ def run_container(cont):
 
 
 def build_container(cont):
-	df = open(cont["folder"] + "/Dockerfile", "r")
+	os.chdir(root_folder + "/" + cont["folder"])
+	df = open("Dockerfile", "r")
 	dockerfile = df.read()
 	f = BytesIO(dockerfile.encode('utf-8'))
 	response = []
-	for line in docker_client.build(fileobj = f, rm = True, tag = cont["image"]["RepoTag"]):
+	for line in docker_client.build(fileobj = f, dockerfile = "./Dockerfile", rm = True, tag = cont["image"]["RepoTag"]):
 		print(json.dumps(json.loads(line.decode('utf-8')), indent = 4).encode("utf-8"))
 		response.append(line)
+	os.chdir("../")
 	return response
 
 
 def starter(cont):
+	if "ignore" in cont and cont["ignore"]:
+		return
 	if len(cont["env"]["dependent"]):
 		for depend in cont["env"]["dependent"]:
 			starter(config["containers"][depend])
