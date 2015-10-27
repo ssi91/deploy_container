@@ -91,15 +91,13 @@ def run_container(cont):
 
 
 def build_container(cont):
-	os.chdir(root_folder + "/" + cont["folder"])
-	df = open("Dockerfile", "r")
+	df = open(cont["folder"] + "/Dockerfile", "r")
 	dockerfile = df.read()
 	f = BytesIO(dockerfile.encode('utf-8'))
 	response = []
 	for line in docker_client.build(fileobj = f, dockerfile = "./Dockerfile", rm = True, tag = cont["image"]["RepoTag"]):
 		print(json.dumps(json.loads(line.decode('utf-8')), indent = 4).encode("utf-8"))
 		response.append(line)
-	os.chdir("../")
 	return response
 
 
