@@ -124,6 +124,32 @@
                     ]
                 ]
             }
+        },
+        "hs_vkidcollector": {
+            "ignore": true,
+            "folder": "hs_vkidcollector",
+            "name": "hs_vkidcollector",
+            "id": "",
+            "image": {
+                "id": "",
+                "RepoTag": "hs_vkidcollector:0",
+                "ExtRepo": false
+            },
+            "env": {
+                "dependent": [
+                    "hs_mongo_data",
+                    "hs_mongo_journal",
+                    "hs_rmq"
+                ],
+                "volumes": [
+                    [
+                        "hs_vkidcollector/util/source",
+                        "/root/util/source"
+                    ]
+                ],
+                "vars": [],
+                "ports": []
+            }
         }
     }
 }
