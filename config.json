@@ -53,8 +53,10 @@
             "env": {
                 "dependent": [],
                 "volumes": [
-                    "uwsgihs/hs_mongo_data",
-                    "/data/db"
+                    [
+                        "uwsgihs/hs_mongo_data",
+                        "/data/db"
+                    ]
                 ],
                 "vars": [],
                 "ports": [
