@@ -101,6 +101,10 @@ def build_container(cont):
 	return response
 
 
+def rm_cont(cont):
+	docker_client.remove_container(container = cont["name"])
+
+
 def starter(cont):
 	if "ignore" in cont and cont["ignore"]:
 		return
@@ -109,10 +113,19 @@ def starter(cont):
 			starter(config["containers"][depend])
 	name_for_search = "/" + cont["name"]
 	if is_exist_container(name_for_search, "running"):
+		if "rm" in cont and cont["rm"]:
+			id = id_container(name_for_search, None)
+			docker_client.stop(container = id)
+			docker_client.remove_container(container = id)
+			run_container(cont)
 		return
 	elif is_exist_container(name_for_search, None):
 		id = id_container(name_for_search, None)
-		docker_client.start(container = id)
+		if "rm" in cont and cont["rm"]:
+			docker_client.remove_container(container = id)
+			run_container(cont)
+		else:
+			docker_client.start(container = id)
 		return
 	else:
 		if is_exist_image(cont["image"]["RepoTag"]) or cont["image"]["ExtRepo"]:

@@ -91,6 +91,7 @@
             }
         },
         "ngx_openresty": {
+            "rm": true,
             "folder": "ngx_openresty",
             "name": "ngx_openresty",
             "id": "",
