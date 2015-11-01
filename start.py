@@ -10,6 +10,7 @@ from io import BytesIO
 def create_parser():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--home", default = os.environ["HOME"])
+	parser.add_argument("--conf", default = "config.json")
 
 	return parser
 
@@ -17,7 +18,7 @@ def create_parser():
 parser = create_parser()
 namespace = parser.parse_args(sys.argv[1:])
 
-config = parseconfig.conf_dict("config.json")
+config = parseconfig.conf_dict(namespace.conf)
 
 root_folder = namespace.home + "/" + config["folder"]
 os.chdir(root_folder)
@@ -75,7 +76,6 @@ def run_container(cont):
 			port_bind[port[0]] = port[1]
 		elif len(port) == 1:
 			pass
-		# port_bind[port[0]] = None
 	links = []
 	for link in cont["env"]["dependent"]:
 		links.append((link, link))
